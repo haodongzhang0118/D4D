@@ -2,6 +2,19 @@ import argparse
 from utils.GeneratePatches import generate_patches
 from utils.CombineTwoFolders import CombineTwoFolders
 
+"""
+The training data we use is the combination of the training and validation data from the DIV2K dataset.
+We first combine the training and validation data into a single folder, then generate patches from the combined data.
+
+DIV2K dataset can be downloaded from kaggle
+import kagglehub
+
+# Download latest version
+path = kagglehub.dataset_download("soumikrakshit/div2k-high-resolution-images")
+
+print("Path to dataset files:", path)
+"""
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Preprocess images')
@@ -20,9 +33,8 @@ if __name__ == "__main__":
     patch_size = args.ps
     num_cores = args.num_cores
 
-    print(f"Combining {train_dir} and {val_dir} to {tar_dir}")
+    print(f"Combining train_dir and val_dir to tar_dir")
     CombineTwoFolders(train_dir, val_dir, tar_dir)
-    print(f"Generating patches from {tar_dir} to {patch_dir}")
+    print(f"Generating patches from tar_dir to patch_dir")
     generate_patches(tar_dir, patch_dir, patch_size, num_cores)
-
-
+    print("Preprocessing complete.")
