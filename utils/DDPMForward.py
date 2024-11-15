@@ -1,7 +1,6 @@
 import torch
 from torchvision import transforms
 from PIL import Image
-from einops import rearrange
 from tqdm import tqdm
 from collections import defaultdict
 from pathlib import Path
@@ -192,21 +191,24 @@ class DDPMForward_array:
         return Image.fromarray(tensor)
 
 # Example usage
+"""
 if __name__ == "__main__":
     import os
+    from einops import rearrange
     ddpm = DDPMForward_array(
         num_timesteps=1000,
         img_size=256
     )
     x_0 = ddpm.Load_all_images(
-        r"C:\Users\haodo\OneDrive\Desktop\CS 2470\Final Project\D4D\samples\test_image",
+        r"path\to\images",
     )
     x_t = ddpm.forward_diffusion_all_steps(x_0, specific_timesteps=256)
     x_t = rearrange(x_t, 'b t c h w -> t b c h w')
     # # # Ensure the directory exists before saving files
-    save_path = r"C:\Users\haodo\OneDrive\Desktop\CS 2470\Final Project\D4D\samples\ddpm_forward_result"
+    save_path = r"path\to\save"
     os.makedirs(save_path, exist_ok=True)  # Create the directory if it does not exist
     # # Save results
     for i in range(2):
         for t, img in enumerate(x_t):
             ddpm.tensor_to_image(x_t[t, i, :, :, :]).save(os.path.join(save_path, f"image{i}_noised_t{t}.png"))  # Use os.path.join for path construction
+"""
