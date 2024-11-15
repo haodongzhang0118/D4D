@@ -1,6 +1,6 @@
 from torch.utils.data import Dataset, DataLoader
 from pathlib import Path
-from utils.DDPMForward import DDPMForward, DDPMForward_array
+from utils.DDPMForward import DDPMForward
 
 class NoiseEstimationMixedDataset(Dataset):
     def __init__(self, image_dir, transform=None, clean_image=None, img_size=256, num_timesteps=1000, specific_timesteps=256, saved_all_data_first=False):
@@ -8,7 +8,7 @@ class NoiseEstimationMixedDataset(Dataset):
         self.img_size = img_size
         self.specified_timesteps = specific_timesteps
         self.transform = transform
-        self.ddpm = DDPMForward_array(transform=self.transform, num_timesteps=num_timesteps, img_size=img_size)
+        self.ddpm = DDPMForward(transform=self.transform, num_timesteps=num_timesteps, img_size=img_size)
         self.saveFirst = saved_all_data_first
         if self.saveFirst:
             # Load All image to torch tensor first to save Dataloader time. It will generate a pt file called cleanImage.pt which contains this tensor
