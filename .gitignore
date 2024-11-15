@@ -1,0 +1,6 @@
+# Exclude all PyTorch model files
+*.pt
+*.pth
+
+# Exclude Python cache directories
+__pycache__/
