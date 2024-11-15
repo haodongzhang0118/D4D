@@ -2,7 +2,7 @@ import torch
 from torchvision import transforms
 from PIL import Image
 from einops import rearrange
-from tqdm.auto import tqdm
+from tqdm import tqdm
 from collections import defaultdict
 from pathlib import Path
 from joblib import Parallel, delayed
@@ -198,15 +198,15 @@ if __name__ == "__main__":
         num_timesteps=1000,
         img_size=256
     )
-    x_0 = ddpm.forward_diffusion_all_steps(
-        r"C:\Users\haodo\OneDrive\Desktop\CS 2470\Final Project\Denoise Dataset\DIV2K\3patches",
-        clean_image=None,
-        specific_timesteps=256
+    x_0 = ddpm.Load_all_images(
+        r"C:\Users\haodo\OneDrive\Desktop\CS 2470\Final Project\D4D\samples\test_image",
     )
-    # torch.save(x_t, 'noisedImages.pt')
+    x_t = ddpm.forward_diffusion_all_steps(x_0, specific_timesteps=256)
+    x_t = rearrange(x_t, 'b t c h w -> t b c h w')
     # # # Ensure the directory exists before saving files
-    # save_path = r"C:\Users\haodo\OneDrive\Desktop\CS 2470\Final Project\D4D\samples\test"
-    # os.makedirs(save_path, exist_ok=True)  # Create the directory if it does not exist
+    save_path = r"C:\Users\haodo\OneDrive\Desktop\CS 2470\Final Project\D4D\samples\ddpm_forward_result"
+    os.makedirs(save_path, exist_ok=True)  # Create the directory if it does not exist
     # # Save results
-    # for t, img in tqdm(enumerate(x_t)):
-    #     ddpm.tensor_to_image(x_t[t, 1, :, :, :]).save(os.path.join(save_path, f"noised_t{t}.png"))  # Use os.path.join for path construction
+    for i in range(2):
+        for t, img in enumerate(x_t):
+            ddpm.tensor_to_image(x_t[t, i, :, :, :]).save(os.path.join(save_path, f"image{i}_noised_t{t}.png"))  # Use os.path.join for path construction
