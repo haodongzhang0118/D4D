@@ -4,3 +4,4 @@
 
 # Exclude Python cache directories
 __pycache__/
+test/
