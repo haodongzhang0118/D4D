@@ -2,6 +2,7 @@ import torch
 from torchvision import transforms
 from PIL import Image
 from tqdm.auto import tqdm
+from collections import defaultdict
 
 class DDPMForward:
     def __init__(
@@ -55,6 +56,7 @@ class DDPMForward:
     def forward_diffusion_all_steps(
         self,
         image_path,
+        results: defaultdict = defaultdict(list),
         save_intermediates=False,
         specific_timesteps=None
     ):
@@ -74,18 +76,15 @@ class DDPMForward:
         if specific_timesteps is None:
             specific_timesteps = list(range(0, self.num_timesteps, 50))  # Every 50 steps
 
-        results = {}
         x_t = x_0
 
-        for t in tqdm(range(self.num_timesteps)):
+        for t in range(self.num_timesteps):
             # Add noise for this timestep
             x_t, noise = self.forward_diffusion(x_0, torch.tensor([t]).to(self.device))
 
             # Save if this is a requested timestep
             if t in specific_timesteps or save_intermediates:
-                results[t] = self.tensor_to_image(x_t)
-
-        return results
+                results[t].append(x_t)
 
     @staticmethod
     def tensor_to_image(tensor):
@@ -105,16 +104,19 @@ if __name__ == "__main__":
         img_size=256
     )
 
-    results = ddpm.forward_diffusion_all_steps(
-        r"path/to/image.png",
-        specific_timesteps=[i for i in range(1000)]
+    results = defaultdict(list)
+
+    ddpm.forward_diffusion_all_steps(
+        r"path/to/input/image.png",
+        results=results,
+        specific_timesteps=[i for i in range(256)]
     )
 
     # Ensure the directory exists before saving files
-    save_path = r"path/to/save"
+    save_path = r"path/to/save/results"
     os.makedirs(save_path, exist_ok=True)  # Create the directory if it does not exist
 
     # Save results
     for t, img in tqdm(results.items()):
-        img.save(os.path.join(save_path, f"noised_t{t}.png"))  # Use os.path.join for path construction
+        ddpm.tensor_to_image(img[0]).save(os.path.join(save_path, f"noised_t{t}.png"))  # Use os.path.join for path construction
 """
