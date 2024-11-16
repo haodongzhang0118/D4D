@@ -4,7 +4,7 @@ training:
   batch_size: 16
   lr: 1.0e-4
   min_lr: 1.0e-6
-  weight_decay: 0.01
+  weight_decay: 0.0001
 
 # Model settings
 model:
@@ -17,7 +17,7 @@ model:
   num_timesteps: 1000
   specific_timesteps: 256
   final_embedding_dim: 768
-  saved_all_data_first: true # Recommended to be false cause it may needs a lot of memory
+  saved_all_data_first: false # Recommended to be false cause it needs a lot of memory
 
 # Data settings
 data:
