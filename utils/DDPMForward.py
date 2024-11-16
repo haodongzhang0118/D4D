@@ -13,12 +13,14 @@ class DDPMForward:
         beta_start=0.0001,
         beta_end=0.02,
         img_size=256,
-        device=None
+        device=None,
+        img_type='clean'
     ):
         self.transform = transform
         self.num_timesteps = num_timesteps
         self.img_size = img_size
         self.device = device or torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.img_type = img_type
         print(f"Using device: {self.device}")
 
         # Define noise schedule
@@ -58,15 +60,15 @@ class DDPMForward:
     def Load_all_images(
         self,
         image_dir=None,
-        clean_image=None,
+        saved_image=None,
         num_cores=6
     ):
         """
         Perform complete forward diffusion process
         """
-        assert (image_dir is not None) or (clean_image is not None) , "Either image_dir or clean_image must be provided"
-        if clean_image is not None:
-            x_0 = torch.load(clean_image)
+        assert (image_dir is not None) or (saved_image is not None) , "Either image_dir or clean_image must be provided"
+        if saved_image is not None:
+            x_0 = torch.load(saved_image)
         else:
             # Process images in parallel and collect results
             image_dir = Path(image_dir)
@@ -77,7 +79,8 @@ class DDPMForward:
             )
             # Stack all processed images along batch dimension
             x_0 = torch.stack(processed_images, dim=0)  # Shape: (42744, 1, 3, 256, 256)
-            torch.save(x_0, 'cleanImage.pt')
+            save_name = self.img_type + "Image.pt"
+            torch.save(x_0, save_name)
         return x_0
 
     def forward_diffusion_all_steps(
@@ -103,7 +106,7 @@ class DDPMForward:
 if __name__ == "__main__":
     import os
     from einops import rearrange
-    ddpm = DDPMForward_array(
+    ddpm = DDPMForward(
         num_timesteps=1000,
         img_size=256
     )
