@@ -14,7 +14,7 @@ if __name__ == '__main__':
     
     dataset = NoiseEstimationDataset(image_dir=config.image_dir, 
                                      clean_image=config.clean_image, 
-                                     img_size=config.img_size, 
+                                     img_size=config.image_size, 
                                      specific_timesteps=config.specific_timesteps, 
                                      saved_all_data_first=config.saved_all_data_first)
     
@@ -28,7 +28,7 @@ if __name__ == '__main__':
                                 patch_size=config.patch_size, 
                                 num_heads=config.num_heads, 
                                 num_layers=config.num_layers,
-                                final_embedding_dim=config.final_embedding_dim)
+                                final_embedding=config.final_embedding_dim)
     
     trainer = Trainer(model, dataloader, config)
     trainer.train()

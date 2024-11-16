@@ -17,7 +17,7 @@ class ConfigParser:
         """Parse YAML config file to namespace object"""
         with open(yaml_path, 'r') as f:
             config_dict = yaml.safe_load(f)
-        return ConfigParser.dict_to_namespace(config_dict)
+        return ConfigParser.flatten_namespace(ConfigParser.dict_to_namespace(config_dict))
     
     @staticmethod
     def dict_to_namespace(d: Dict[str, Any]) -> SimpleNamespace:
@@ -29,6 +29,19 @@ class ConfigParser:
             else:
                 setattr(namespace, key, value)
         return namespace
+    
+    @staticmethod
+    def flatten_namespace(nested_namespace):
+        flat_namespace = SimpleNamespace()
+        def add_attributes(ns):
+            for key, value in vars(ns).items():
+                if isinstance(value, SimpleNamespace):
+                    add_attributes(value)
+                else:
+                    setattr(flat_namespace, key, value)
+        
+        add_attributes(nested_namespace)
+        return flat_namespace
 
 class Trainer:
     def __init__(
