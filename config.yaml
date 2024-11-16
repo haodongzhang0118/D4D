@@ -1,0 +1,36 @@
+# Training settings
+training:
+  num_epochs: 20
+  batch_size: 16
+  lr: 1.0e-4
+  min_lr: 1.0e-6
+  weight_decay: 0.01
+
+# Model settings
+model:
+  d_model: 1024
+  in_channels: 3
+  image_size: 256
+  patch_size: 16
+  num_heads: 8
+  num_layers: 12
+  num_timesteps: 1000
+  specific_timesteps: 256
+  final_embedding_dim: 768
+  saved_all_data_first: true # Recommended to be false cause it may needs a lot of memory
+
+# Data settings
+data:
+  train_dir: '/content/drive/MyDrive/Dataset/DIV2K/3patches'  # Path to training directory
+  clean_image: '/content/drive/MyDrive/cleanImage.pt' # Path to clean image directory
+  num_workers: 0
+
+# Logging settings
+logging:
+  log_dir: 'logs'
+  use_wandb: false
+  project_name: 'noise-estimation-clip'
+
+# Checkpoint settings
+checkpoint:
+  resume_from: null  # Path to checkpoint if resuming

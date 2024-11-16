@@ -3,7 +3,14 @@ from pathlib import Path
 from utils.DDPMForward import DDPMForward
 
 class NoiseEstimationDataset(Dataset):
-    def __init__(self, image_dir, transform=None, clean_image=None, img_size=256, num_timesteps=1000, specific_timesteps=256, saved_all_data_first=False):
+    def __init__(self, image_dir, 
+                 transform=None, 
+                 clean_image=None, 
+                 img_size=256, 
+                 num_timesteps=1000, 
+                 specific_timesteps=256, 
+                 saved_all_data_first=False):
+        
         self.image_dir = Path(image_dir)
         self.img_size = img_size
         self.specified_timesteps = specific_timesteps
