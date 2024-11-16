@@ -2,15 +2,29 @@ import argparse
 from trainer import Trainer, ConfigParser
 from model import NoiseEstimationClip
 from dataset import NoiseEstimationDataset, create_dataloaders
+from types import SimpleNamespace
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', type=str, default='config.yaml', help='Path to config file')
     return parser.parse_args()
 
+def flatten_namespace(nested_namespace):
+    flat_namespace = SimpleNamespace()
+    def add_attributes(ns):
+        for key, value in vars(ns).items():
+            if isinstance(value, SimpleNamespace):
+                add_attributes(value)
+            else:
+                setattr(flat_namespace, key, value)
+    
+    add_attributes(nested_namespace)
+    return flat_namespace
+
 if __name__ == '__main__':
     args = parse_args()
     config = ConfigParser.parse_yaml(args.config)
+    config = flatten_namespace(config)
     
     dataset = NoiseEstimationDataset(image_dir=config.image_dir, 
                                      clean_image=config.clean_image, 
