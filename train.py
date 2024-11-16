@@ -29,6 +29,7 @@ if __name__ == '__main__':
                                 num_heads=config.num_heads, 
                                 num_layers=config.num_layers,
                                 final_embedding_dim=config.final_embedding_dim)
+    
     trainer = Trainer(model, dataloader, config)
     trainer.train()
     
