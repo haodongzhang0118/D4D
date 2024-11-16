@@ -162,11 +162,10 @@ class Trainer:
         self.model.eval()
         predictions = torch.tensor([], dtype=torch.bool).to(self.device)
 
-        timestep = torch.arange(self.valid_data_loader.specific_timesteps).to(self.device)
-        for images, label in self.valid_data_loader:
+        for images, label, specific in self.valid_data_loader:
             images = images.to(self.device)
             label = label.to(self.device)
-
+            timestep = torch.arange(specific).to(self.device)
             logits = self.model(images, timestep)
             predictions.append((torch.argmax(logits, dim=1) == label))
         

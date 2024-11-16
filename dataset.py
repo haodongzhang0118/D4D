@@ -77,7 +77,7 @@ class NoiseEstimationValidationDataset(Dataset):
         label = torch.randint(0, self.specified_timesteps, (1,)).item()
         x_t = x_t.squeeze(0)
         x_t = x_t[label]
-        return x_t, label
+        return x_t, label, self.specified_timesteps
 
 def create_dataloaders(dataset, batch_size=32, num_workers=0):
     dataloader = DataLoader(
