@@ -72,14 +72,14 @@ class DDPMForward:
             image_dir = Path(image_dir)
             image_paths = list(image_dir.glob("*.png"))
             processed_images = Parallel(n_jobs=num_cores)(
-                delayed(self.prepare_single_image)(str(img_path)) 
+                delayed(self.prepare_single_image)(str(img_path))
                 for img_path in tqdm(image_paths)
             )
             # Stack all processed images along batch dimension
             x_0 = torch.stack(processed_images, dim=0)  # Shape: (42744, 1, 3, 256, 256)
             torch.save(x_0, 'cleanImage.pt')
         return x_0
-    
+
     def forward_diffusion_all_steps(
         self,
         x_0,
@@ -88,7 +88,7 @@ class DDPMForward:
         x_0 = x_0.to(self.device)
         x_t = self.forward_diffusion(x_0, specific_timesteps)
         return x_t
-    
+
     @staticmethod
     def tensor_to_image(tensor):
         """Convert tensor back to PIL Image"""
