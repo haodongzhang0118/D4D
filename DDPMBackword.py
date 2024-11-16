@@ -1,8 +1,6 @@
 import torch
-import torch.nn.functional as F
 from torchvision import transforms
 from PIL import Image
-from diffusers import UNet2DModel, DDPMScheduler
 from diffusers import DDPMPipeline
 from tqdm.auto import tqdm
 
