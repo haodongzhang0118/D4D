@@ -31,10 +31,10 @@ class NoiseEstimationClip(nn.Module):
         x = self.vit(x)
         t = self.timestepEncoder(t)
         
-        image_features = image_features / image_features.norm(dim=1, keepdim=True)
-        timestep_features = timestep_features / timestep_features.norm(dim=1, keepdim=True)
+        x = x / x.norm(dim=1, keepdim=True)
+        t = t / t.norm(dim=1, keepdim=True)
         
         logit_scale = self.logit_scale.exp()
-        logits = logit_scale * image_features @ timestep_features.t()
+        logits = logit_scale * x @ t.t()
         
         return logits

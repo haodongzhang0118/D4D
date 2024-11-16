@@ -33,7 +33,7 @@ class vitEncoder(nn.Module):
         super().__init__()
         patch_dim = 3 * (image_size // patch_size) ** 2
         self.patch_embed = PatchEmbeddings(patch_dim, patch_size, in_channels)
-        self.pos_embed = LearnablePositionalEmbeddings(d_model, 14*14)
+        self.pos_embed = LearnablePositionalEmbeddings(d_model, (image_size // patch_size) ** 2)
         self.mlp = nn.Linear(patch_dim, d_model)
         self.cls_token = nn.Parameter(torch.randn(1, 1, d_model))
         
@@ -51,9 +51,9 @@ class vitEncoder(nn.Module):
         B = x.shape[0]
         x = self.patch_embed(x)
         x = self.mlp(x)
-        x = self.pos_embed(x)
         cls_tokens = self.cls_token.expand(B, -1, -1)
         x = torch.cat((cls_tokens, x), dim=1)
+        x = self.pos_embed(x)
         x = self.transformer(x)
         x = x[:, 0] # B D
         x = self.fc(x) # B F

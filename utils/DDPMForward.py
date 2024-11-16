@@ -52,23 +52,26 @@ class DDPMForward:
             Noised image at timestep t and the noise added
         """
         noise = torch.randn_like(x_0)
-        sqrt_alpha_cumprod_t = self.sqrt_alphas_cumprod.view(1, -1, 1, 1, 1)
-        sqrt_one_minus_alpha_cumprod_t = self.sqrt_one_minus_alphas_cumprod.view(1, -1, 1, 1, 1)
+        sqrt_alphas_cumprod_clip = self.sqrt_alphas_cumprod[:specific_timesteps]
+        sqrt_alpha_cumprod_t = sqrt_alphas_cumprod_clip.view(1, -1, 1, 1, 1)
+
+        sqrt_one_minus_alphas_cumprod_clip = self.sqrt_one_minus_alphas_cumprod[:specific_timesteps]
+        sqrt_one_minus_alpha_cumprod_t = sqrt_one_minus_alphas_cumprod_clip.view(1, -1, 1, 1, 1)
         x_t = sqrt_alpha_cumprod_t * x_0 + sqrt_one_minus_alpha_cumprod_t * noise
-        return x_t[:, :specific_timesteps, :, :, :]
+        return x_t
 
     def Load_all_images(
         self,
         image_dir=None,
-        saved_image=None,
+        clean_image=None,
         num_cores=6
     ):
         """
         Perform complete forward diffusion process
         """
-        assert (image_dir is not None) or (saved_image is not None) , "Either image_dir or clean_image must be provided"
-        if saved_image is not None:
-            x_0 = torch.load(saved_image)
+        assert (image_dir is not None) or (clean_image is not None) , "Either image_dir or clean_image must be provided"
+        if clean_image is not None:
+            x_0 = torch.load(clean_image)
         else:
             # Process images in parallel and collect results
             image_dir = Path(image_dir)

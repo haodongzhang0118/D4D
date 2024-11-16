@@ -198,6 +198,7 @@ class Trainer:
             batch_loss = 0
             for i in range(B):
                 images = x[:, i, :, :, :]
+                # images = images.to(self.device)
                 
                 logits = self.model(images, t)
                 
