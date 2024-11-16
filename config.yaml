@@ -1,8 +1,9 @@
 # Training settings
 training:
-  num_epochs: 20
+  epochs: 50
   batch_size: 16
-  lr: 1.0e-4
+  warmup_epochs: 5
+  lr: 0.005
   min_lr: 1.0e-6
   weight_decay: 0.0001
 
