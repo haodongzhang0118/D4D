@@ -1,7 +1,7 @@
 import argparse
 from trainer import Trainer, ConfigParser
 from model import NoiseEstimationClip
-from dataset import NoiseEstimationDataset, create_dataloaders
+from dataset import NoiseEstimationDataset, NoiseEstimationValidationDataset, create_dataloaders
 from types import SimpleNamespace
 
 def parse_args():
@@ -33,7 +33,7 @@ if __name__ == '__main__':
                                      saved_all_data_first=config.saved_all_data_first,
                                      num_cores=config.num_cores)
     
-    valid_dataset = NoiseEstimationDataset(image_dir=config.valid_dir,
+    valid_dataset = NoiseEstimationValidationDataset(image_dir=config.valid_dir,
                                            clean_image=config.valid_image,
                                            img_size=config.image_size,
                                            specific_timesteps=config.specific_timesteps,

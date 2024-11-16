@@ -160,12 +160,12 @@ class Trainer:
     @torch.no_grad()
     def valid_accuracy_calculate(self):
         self.model.eval()
-        predictions = torch.tensor([], dtype=torch.bool).to(self.device)
+        predictions = []
 
-        for (images, label, specific) in self.valid_data_loader:
+        for images, label, specific in self.valid_data_loader:
             images = images.to(self.device)
             label = label.to(self.device)
-            timestep = torch.arange(specific).to(self.device)
+            timestep = torch.arange(int(specific[0].item())).to(self.device)
             logits = self.model(images, timestep)
             predictions.append((torch.argmax(logits, dim=1) == label))
         
