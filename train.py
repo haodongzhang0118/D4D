@@ -30,7 +30,8 @@ if __name__ == '__main__':
                                      clean_image=config.clean_image, 
                                      img_size=config.image_size, 
                                      specific_timesteps=config.specific_timesteps, 
-                                     saved_all_data_first=config.saved_all_data_first)
+                                     saved_all_data_first=config.saved_all_data_first,
+                                     num_cores=config.num_cores)
     
     dataloader = create_dataloaders(dataset, 
                                     batch_size=config.batch_size, 

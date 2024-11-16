@@ -6,6 +6,7 @@ training:
   lr: 0.005
   min_lr: 1.0e-6
   weight_decay: 0.0001
+  num_cores: 6
 
 # Model settings
 model:

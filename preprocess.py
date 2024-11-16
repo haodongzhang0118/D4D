@@ -23,7 +23,7 @@ if __name__ == "__main__":
     parser.add_argument('--tar_dir', type=str, help='Directory for combined images')
     parser.add_argument('--patch_dir', type=str, help='Directory for patched images')
     parser.add_argument('--ps', default=256, type=int, help='Patch size (e.g., 256 for 256x256 patches)')
-    parser.add_argument('--num_cores', default=4, type=int, help='Number of CPU cores for parallel processing')
+    parser.add_argument('--num_cores', default=6, type=int, help='Number of CPU cores for parallel processing')
 
     args = parser.parse_args()
     train_dir = args.train_dir

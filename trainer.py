@@ -250,4 +250,4 @@ class Trainer:
             if self.config.use_wandb:
                 wandb.finish()
             
-            logging.info(f'Training finished. Best loss: {self.best_loss:.4f}')
+            logging.info(f'Training finished.')
