@@ -24,6 +24,7 @@ model:
 # Data settings
 data:
   image_dir: '/content/drive/MyDrive/Dataset/DIV2K/3patches'  # Path to training directory
+  valid_dir: '/content/drive/MyDrive/Dataset/validation_patches'  # Path to validation directory
   clean_image: '/content/drive/MyDrive/cleanImage.pt' # Path to clean image directory
   valid_image: '/content/drive/MyDrive/validImage.pt' # Path to valid image directory
   num_workers: 0

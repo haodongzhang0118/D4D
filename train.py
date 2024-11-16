@@ -33,9 +33,20 @@ if __name__ == '__main__':
                                      saved_all_data_first=config.saved_all_data_first,
                                      num_cores=config.num_cores)
     
+    valid_dataset = NoiseEstimationDataset(image_dir=config.valid_dir,
+                                           clean_image=config.valid_image,
+                                           img_size=config.image_size,
+                                           specific_timesteps=config.specific_timesteps,
+                                           saved_all_data_first=config.saved_all_data_first,
+                                           num_cores=config.num_cores)
+    
     dataloader = create_dataloaders(dataset, 
                                     batch_size=config.batch_size, 
                                     num_workers=config.num_workers)
+    
+    valid_dataloader = create_dataloaders(valid_dataset,
+                                          batch_size=config.batch_size,
+                                          num_workers=config.num_workers)
     
     model = NoiseEstimationClip(d_model=config.d_model,
                                 in_channels=config.in_channels, 
@@ -45,6 +56,6 @@ if __name__ == '__main__':
                                 num_layers=config.num_layers,
                                 final_embedding=config.final_embedding_dim)
     
-    trainer = Trainer(model, dataloader, config)
+    trainer = Trainer(model, dataloader, valid_dataloader, config)
     trainer.train()
     

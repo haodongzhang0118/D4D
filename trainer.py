@@ -38,6 +38,7 @@ class Trainer:
             self,
             model,
             data_loader,
+            valid_data_loader,
             config,
     ):
         self._validate_config(config)
@@ -45,6 +46,7 @@ class Trainer:
         # Initialize basic attributes
         self.model = model
         self.data_loader = data_loader
+        self.valid_data_loader = valid_data_loader
         self.config = config
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model.to(self.device)
@@ -56,7 +58,7 @@ class Trainer:
         self.setup_logging()
 
         # Initialize tracking variables
-        self.best_loss = float('inf')
+        self.best_valid_acurracy = 0
         self.current_epoch = 0
 
         # Load checkpoint if specified
@@ -128,7 +130,8 @@ class Trainer:
             'model_state_dict': self.model.state_dict(),
             'optimizer_state_dict': self.optimizer.state_dict(),
             'scheduler_state_dict': self.scheduler.state_dict(),
-            'best_loss': self.best_loss,
+            'best_valid_acurracy': self.best_valid_acurracy,
+
             'config': self.config
         }
 
@@ -138,7 +141,7 @@ class Trainer:
         if is_best:
             best_path = self.log_dir / 'best.pth'
             torch.save(checkpoint, best_path)
-            logging.info(f'Saved new best model with loss {self.best_loss:.4f}')
+            logging.info(f'Saved new best model with accuracy {self.best_valid_acurracy:.4f}')
 
     def load_checkpoint(self, path):
         """Load model and training state from checkpoint"""
@@ -149,10 +152,27 @@ class Trainer:
         self.model.load_state_dict(checkpoint['model_state_dict'])
         self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         self.scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
-        self.best_loss = checkpoint['best_loss']
+        self.best_valid_acurracy = checkpoint['best_valid_acurracy']
         
         logging.info(f'Loaded checkpoint from epoch {self.current_epoch} '
-                    f'with best loss {self.best_loss:.4f}')
+                    f'with best loss {self.best_valid_acurracy:.4f}')
+
+    @torch.no_grad()
+    def valid_accuracy_calculate(self):
+        self.model.eval()
+        predictions = torch.tensor([], dtype=torch.bool).to(self.device)
+
+        timestep = torch.arange(self.valid_data_loader.specific_timesteps).to(self.device)
+        for images, label in self.valid_data_loader:
+            images = images.to(self.device)
+            label = label.to(self.device)
+
+            logits = self.model(images, timestep)
+            predictions.append((torch.argmax(logits, dim=1) == label))
+        
+        predictions = torch.cat(predictions)
+        return torch.mean(predictions.float()).item()
+        
 
     def train_one_epoch(self):
         """Train for one epoch"""
@@ -232,10 +252,12 @@ class Trainer:
                         'learning_rate': self.scheduler.get_last_lr()[0]
                     })
 
-                # is_best = train_loss < self.best_loss
-                # if is_best:
-                #     self.best_loss = train_loss
-                # self.save_checkpoint(is_best=is_best)
+                valid_accuracy = self.valid_accuracy_calculate()
+
+                is_best = valid_accuracy > self.best_valid_acurracy
+                if is_best:
+                    self.best_valid_acurracy = valid_accuracy
+                self.save_checkpoint(is_best=is_best)
 
         except KeyboardInterrupt:
             logging.info('Training interrupted by user')
