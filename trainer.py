@@ -199,9 +199,9 @@ class Trainer:
                 images = x[:, i, :, :, :]
                 # images = images.to(self.device)
                 
-                logits = self.model(images, t)
-                
                 self.optimizer.zero_grad()
+
+                logits = self.model(images, t)
                 labels = torch.arange(len(images)).to(self.device)
                 loss_i = nn.functional.cross_entropy(logits, labels)
                 loss_t = nn.functional.cross_entropy(logits.t(), labels)
@@ -211,7 +211,7 @@ class Trainer:
                 self.optimizer.step()
                 batch_loss += loss.item()
 
-            batch_loss = batch_loss / B
+            # batch_loss = batch_loss / B
             total_loss += batch_loss
             
             pbar.set_postfix({
