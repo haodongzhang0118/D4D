@@ -253,6 +253,7 @@ class Trainer:
                     })
 
                 valid_accuracy = self.valid_accuracy_calculate()
+                print(f'Validation accuracy: {valid_accuracy:.4f}')
 
                 is_best = valid_accuracy > self.best_valid_acurracy
                 if is_best:
