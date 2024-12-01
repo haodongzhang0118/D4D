@@ -24,7 +24,7 @@ class DDPMForward:
         print(f"Using device: {self.device}")
 
         # Define noise schedule
-        self.betas = torch.linspace(beta_start, beta_end, num_timesteps).to(self.device)
+        self.betas = torch.linspace(beta_start, beta_end, num_timesteps) # .to(self.device)
         self.alphas = 1 - self.betas
         self.alphas_cumprod = torch.cumprod(self.alphas, dim=0)
         self.sqrt_alphas_cumprod = torch.sqrt(self.alphas_cumprod)
@@ -91,7 +91,7 @@ class DDPMForward:
         x_0,
         specific_timesteps=256
     ):
-        x_0 = x_0.to(self.device)
+        x_0 = x_0 # .to(self.device)
         x_t = self.forward_diffusion(x_0, specific_timesteps)
         return x_t
 
