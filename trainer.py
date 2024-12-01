@@ -166,8 +166,10 @@ class Trainer:
         for images, label, specific in self.valid_data_loader:
             images = images.to(self.device)
             label = label.to(self.device)
-            timestep = torch.arange(int(specific[0].item())).to(self.device)
-            logits = self.model(images, timestep)
+            _, C, H, W = images.shape
+            t = torch.zeros((1, 1, C, H, W))
+            t = self.ddpm.forward_diffusion(t, specific[0].item()).squeeze(0)
+            logits = self.model(images, t)
             predictions.append((torch.argmax(logits, dim=1) == label))
         
         predictions = torch.cat(predictions)
