@@ -22,9 +22,13 @@ class NoiseEstimationClip(nn.Module):
                               num_heads=num_heads,
                               num_layers=num_layers,
                               final_embedding_dim=final_embedding)
-        self.timestepEncoder = TimestepEmbedding(d_model=d_model, 
-                                                 specific_timesteps=specific_timesteps, 
-                                                 final_embedding=final_embedding)
+        self.timestepEncoder = vitEncoder(d_model=d_model, 
+                              in_channels=in_channels, 
+                              image_size=image_size, 
+                              patch_size=patch_size, 
+                              num_heads=num_heads,
+                              num_layers=num_layers,
+                              final_embedding_dim=final_embedding)
         self.logit_scale = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
 
     def forward(self, x, t):

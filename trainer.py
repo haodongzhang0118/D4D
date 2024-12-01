@@ -13,6 +13,7 @@ from types import SimpleNamespace
 from typing import Dict, Any
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from warmup_scheduler import GradualWarmupScheduler
+from utils.DDPMForward import DDPMForward
 
 class ConfigParser:
     @staticmethod
@@ -49,6 +50,7 @@ class Trainer:
         self.valid_data_loader = valid_data_loader
         self.config = config
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.ddpm = DDPMForward(transform=None, num_timesteps=config.num_timesteps, img_size=config.image_size)
         self.model.to(self.device)
 
         # Setup optimizer and schedulers
@@ -81,7 +83,6 @@ class Trainer:
         self.optimizer = optim.Adam(
             self.model.parameters(),
             lr=self.config.lr,
-            weight_decay=self.config.weight_decay
         )
 
         scheduler_cosine = CosineAnnealingLR(
@@ -189,18 +190,18 @@ class Trainer:
                 [torch.randperm(inputx.shape[1]) for _ in range(inputx.shape[0])]
             )
             x = torch.stack([inputx[i, indices[i]] for i in range(inputx.shape[0])])
-            x = x.to(self.device)
             
-            T, B, _, _, _ = x.shape
-            t = torch.arange(T).to(self.device)
+            T, B, C, H, W = x.shape
+            t = torch.zeros_like((1, C, H, W))
+            t = self.ddpm.forward_diffusion(t, T).squeeze(0)
             
             batch_loss = 0
             for i in range(B):
                 images = x[:, i, :, :, :]
-                # images = images.to(self.device)
+                images = images.to(self.device)
+                t = t.to(self.device)
                 
                 self.optimizer.zero_grad()
-
                 logits = self.model(images, t)
                 labels = torch.arange(len(images)).to(self.device)
                 loss_i = nn.functional.cross_entropy(logits, labels)
@@ -208,10 +209,12 @@ class Trainer:
                 loss = (loss_i + loss_t) / 2
                 
                 loss.backward()
+
+                torch.nn.utils.clip_grad_norm_(self.model.parameters(), float('inf'))
                 self.optimizer.step()
                 batch_loss += loss.item()
 
-            # batch_loss = batch_loss / B
+            batch_loss = batch_loss / B
             total_loss += batch_loss
             
             pbar.set_postfix({

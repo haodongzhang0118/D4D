@@ -15,7 +15,7 @@ model:
   image_size: 256
   patch_size: 16
   num_heads: 8
-  num_layers: 12
+  num_layers: 6
   num_timesteps: 1000
   specific_timesteps: 256
   final_embedding_dim: 768

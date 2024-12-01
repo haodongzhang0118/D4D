@@ -2,6 +2,18 @@ import torch
 import torch.nn as nn
 from einops import rearrange
 
+class Blindspot(nn.Module):
+    def __init__(self, in_channels):
+        super().__init__()
+        self.conv = nn.Conv2d(in_channels, in_channels, kernel_size=3, padding=1, bias=False)
+        self.mask = torch.ones((in_channels, in_channels, 3, 3))
+        self.mask[:, :, 1, 1] = 0
+        self.mask = nn.Parameter(self.mask, requires_grad=False)
+    
+    def forward(self, x):
+        self.conv.weight.data *= self.mask
+        return self.conv(x)
+
 class PatchEmbeddings(nn.Module):
     def __init__(self, d_model, patch_size, in_channels):
         super().__init__()
@@ -31,6 +43,7 @@ class vitEncoder(nn.Module):
                  num_layers=12,
                  final_embedding_dim=768):
         super().__init__()
+        self.blindspot = Blindspot(in_channels)
         patch_dim = 3 * (image_size // patch_size) ** 2
         self.patch_embed = PatchEmbeddings(patch_dim, patch_size, in_channels)
         self.pos_embed = LearnablePositionalEmbeddings(d_model, (image_size // patch_size) ** 2)
@@ -49,6 +62,7 @@ class vitEncoder(nn.Module):
 
     def forward(self, x):
         B = x.shape[0]
+        x = self.blindspot(x)
         x = self.patch_embed(x)
         x = self.mlp(x)
         cls_tokens = self.cls_token.expand(B, -1, -1)
