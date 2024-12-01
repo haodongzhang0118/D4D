@@ -192,7 +192,7 @@ class Trainer:
             x = torch.stack([inputx[i, indices[i]] for i in range(inputx.shape[0])])
             
             T, B, C, H, W = x.shape
-            t = torch.zeros_like((1, C, H, W))
+            t = torch.zeros((1, C, H, W))
             t = self.ddpm.forward_diffusion(t, T).squeeze(0)
             
             batch_loss = 0
@@ -200,7 +200,7 @@ class Trainer:
                 images = x[:, i, :, :, :]
                 images = images.to(self.device)
                 t = t.to(self.device)
-                
+
                 self.optimizer.zero_grad()
                 logits = self.model(images, t)
                 labels = torch.arange(len(images)).to(self.device)
