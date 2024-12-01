@@ -132,6 +132,6 @@ clean_path = "path/to/your/clean/image.png"
 noisy_path = "path/to/your/noisy/image.png"
 main(clean_path, noisy_path)
 """
-clean_path = r"C:\Users\haodo\OneDrive\Desktop\CS 2470\Final Project\Denoise Dataset\CBSD68\original\0010.png"
-noisy_path = r"C:\Users\haodo\OneDrive\Desktop\CS 2470\Final Project\Denoise Dataset\CBSD68\noisy50\0010.png"
+clean_path = r"C:\Users\haodo\OneDrive\Desktop\test\img.png"
+noisy_path = r"C:\Users\haodo\OneDrive\Desktop\test\img_50.png"
 main(clean_path, noisy_path)

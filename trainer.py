@@ -168,7 +168,7 @@ class Trainer:
             label = label.to(self.device)
             _, C, H, W = images.shape
             t = torch.zeros((1, 1, C, H, W))
-            t = self.ddpm.forward_diffusion(t, specific[0].item()).squeeze(0)
+            t = (self.ddpm.forward_diffusion(t, specific[0].item()).squeeze(0)).to(self.device)
             logits = self.model(images, t)
             predictions.append((torch.argmax(logits, dim=1) == label))
         
@@ -207,12 +207,12 @@ class Trainer:
                 logits = self.model(images, t)
                 labels = torch.arange(len(images)).to(self.device)
                 loss_i = nn.functional.cross_entropy(logits, labels)
-                loss_t = nn.functional.cross_entropy(logits.t(), labels)
-                loss = (loss_i + loss_t) / 2
+                loss_t = nn.functional.cross_entropy(logits.T, labels)
+                loss = (loss_i + loss_t) / 2.0
                 
                 loss.backward()
 
-                torch.nn.utils.clip_grad_norm_(self.model.parameters(), float('inf'))
+                # torch.nn.utils.clip_grad_norm_(self.model.parameters(), float('inf'))
                 self.optimizer.step()
                 batch_loss += loss.item()
 

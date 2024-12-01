@@ -36,7 +36,7 @@ class DDPMForward:
             self.transform = transforms.Compose([
                 transforms.Resize((self.img_size, self.img_size)),
                 transforms.ToTensor(),  # Converts to [0, 1]
-                transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])  # Converts to [-1, 1]
+                #transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])  # Converts to [-1, 1]
             ])
         image = Image.open(image_path).convert('RGB')
         return self.transform(image).unsqueeze(0)  # Returns (1, 3, 256, 256)
