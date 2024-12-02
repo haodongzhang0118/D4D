@@ -58,6 +58,8 @@ class DDPMForward:
         sqrt_one_minus_alphas_cumprod_clip = self.sqrt_one_minus_alphas_cumprod[:specific_timesteps]
         sqrt_one_minus_alpha_cumprod_t = sqrt_one_minus_alphas_cumprod_clip.view(1, -1, 1, 1, 1)
         x_t = sqrt_alpha_cumprod_t * x_0 + sqrt_one_minus_alpha_cumprod_t * noise
+
+        x_t = (x_t - x_t.min()) / (x_t.max() - x_t.min())
         return x_t
 
     def Load_all_images(

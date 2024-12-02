@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 import numpy as np
 from vit import vitEncoder
-from timestep_embedding import TimestepEmbedding
 
 class NoiseEstimationClip(nn.Module):
     def __init__(self, 
@@ -29,7 +28,7 @@ class NoiseEstimationClip(nn.Module):
                               num_heads=num_heads,
                               num_layers=num_layers,
                               final_embedding_dim=final_embedding)
-        self.temp = nn.Parameter(torch.ones([]) * 1.0)
+        self.temp = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
 
     def forward(self, x, t):
         x = self.vit(x)
@@ -41,3 +40,4 @@ class NoiseEstimationClip(nn.Module):
         logits = (x @ (t.T)) / self.temp
         
         return logits
+    

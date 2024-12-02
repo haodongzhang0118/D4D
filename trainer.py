@@ -170,6 +170,7 @@ class Trainer:
             t = torch.zeros((1, 1, C, H, W))
             t = (self.ddpm.forward_diffusion(t, specific[0].item()).squeeze(0)).to(self.device)
             logits = self.model(images, t)
+            logits = (100 * logits).softmax(dim=-1)
             predictions.append((torch.argmax(logits, dim=1) == label))
         
         predictions = torch.cat(predictions)
