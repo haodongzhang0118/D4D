@@ -51,6 +51,7 @@ class Trainer:
         self.config = config
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.ddpm = DDPMForward(transform=None, num_timesteps=config.num_timesteps, img_size=config.image_size)
+        self.text_image = config.text_image
         self.model.to(self.device)
 
         # Setup optimizer and schedulers
@@ -175,6 +176,26 @@ class Trainer:
         
         predictions = torch.cat(predictions)
         return torch.mean(predictions.float()).item()
+    
+    @torch.no_grad()
+    def validation_step(self):
+        self.model.eval()
+        correct = 0
+        total = 0
+        
+        with torch.no_grad():
+            for images, label, specific in self.valid_data_loader:
+                images = images.to(self.device)
+                timesteps = torch.arange(specific[0].item()).to(self.device)
+                
+                logits = self.model(images, timesteps)
+                pred = torch.argmax(logits, dim=1)
+                
+                correct += (pred == label.to(self.device)).sum().item()
+                total += label.size(0)
+                
+        return correct / total
+
         
 
     def train_one_epoch(self):
@@ -195,8 +216,11 @@ class Trainer:
             x = torch.stack([inputx[i, indices[i]] for i in range(inputx.shape[0])])
             
             T, B, C, H, W = x.shape
-            t = torch.zeros((1, C, H, W))
-            t = self.ddpm.forward_diffusion(t, T).squeeze(0)
+            if self.text_image:
+                t = torch.arange(T)
+            else:
+                t = torch.zeros((1, C, H, W))
+                t = self.ddpm.forward_diffusion(t, T).squeeze(0)
             
             batch_loss = 0
             for i in range(B):
@@ -257,8 +281,10 @@ class Trainer:
                         'train_loss': train_loss,
                         'learning_rate': self.scheduler.get_last_lr()[0]
                     })
-
-                valid_accuracy = self.valid_accuracy_calculate()
+                if self.text_image:
+                    valid_accuracy = self.validation_step()
+                else:
+                    valid_accuracy = self.valid_accuracy_calculate()
                 print(f'Validation accuracy: {valid_accuracy:.4f}')
 
                 is_best = valid_accuracy > self.best_valid_acurracy
