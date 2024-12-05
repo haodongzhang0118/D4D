@@ -133,7 +133,6 @@ class Trainer:
             'optimizer_state_dict': self.optimizer.state_dict(),
             'scheduler_state_dict': self.scheduler.state_dict(),
             'best_valid_acurracy': self.best_valid_acurracy,
-
             'config': self.config
         }
 
@@ -152,8 +151,18 @@ class Trainer:
         
         self.current_epoch = checkpoint['epoch']
         self.model.load_state_dict(checkpoint['model_state_dict'])
-        self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-        self.scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
+        if self.config.resetLR:
+            self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+            for param_group in self.optimizer.param_groups:
+                param_group['lr'] = self.config.lr
+            self.scheduler = CosineAnnealingLR(
+                self.optimizer,
+                T_max=self.config.epochs - self.current_epoch,
+                eta_min=self.config.min_lr
+            )
+        else:
+            self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+            self.scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
         self.best_valid_acurracy = checkpoint['best_valid_acurracy']
         
         logging.info(f'Loaded checkpoint from epoch {self.current_epoch} '
@@ -204,7 +213,7 @@ class Trainer:
         total_loss = 0
         current_lr = self.scheduler.get_last_lr()[0]
         
-        logging.info(f'Current learning rate: {current_lr:.6f}')
+        logging.info(f'Current learning rate: {current_lr:.8f}')
         pbar = tqdm(self.data_loader, desc=f'Epoch {self.current_epoch}')
 
         for batch_idx, inputx in enumerate(pbar):
@@ -272,7 +281,7 @@ class Trainer:
 
                 logging.info(
                     f'Epoch {epoch}: train_loss={train_loss:.4f}, '
-                    f'lr={self.scheduler.get_last_lr()[0]:.6f}'
+                    f'lr={self.scheduler.get_last_lr()[0]:.8f}'
                 )
 
                 if self.config.use_wandb:

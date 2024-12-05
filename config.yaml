@@ -33,10 +33,11 @@ data:
 
 # Logging settings
 logging:
-  log_dir: 'logs'
+  log_dir: '/content/drive/MyDrive/D4D/logs'
   use_wandb: false
   project_name: 'noise-estimation-clip'
 
 # Checkpoint settings
 checkpoint:
   resume_from: null  # Path to checkpoint if resuming
+  resetLR: false
