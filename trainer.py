@@ -77,7 +77,6 @@ class Trainer:
         assert config.warmup_epochs < config.epochs, "warmup_epochs must be < epochs"
         assert config.min_lr <= config.lr, "min_lr must be <= lr"
         assert config.batch_size > 0, "batch_size must be > 0"
-        assert config.weight_decay >= 0, "weight_decay must be >= 0"
 
     def _setup_optimizer_and_scheduler(self):
         """Setup optimizer and learning rate scheduler"""

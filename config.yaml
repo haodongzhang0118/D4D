@@ -1,11 +1,10 @@
 # Training settings
 training:
-  epochs: 50
+  epochs: 600
   batch_size: 16
   warmup_epochs: 5
-  lr: 0.005
-  min_lr: 1.0e-6
-  weight_decay: 0.0001
+  lr: 1.0e-6
+  min_lr: 1.0e-8
   num_cores: 6
   text_image: True
   clip_pretrained_model_name: "openai/clip-vit-base-patch32" # Choose when text_image is True
