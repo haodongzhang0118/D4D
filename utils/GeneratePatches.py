@@ -20,7 +20,7 @@ from tqdm import tqdm
 # num_cores = args.num_cores
 
 
-def process_image(file_path, patch_size, tar_dir):
+def process_image(file_path, patch_size, tar_dir, mean=0, std=0):
     img = cv2.imread(file_path)
     h, w = img.shape[:2]
     file_name = os.path.basename(file_path).split('.')[0]
@@ -29,7 +29,13 @@ def process_image(file_path, patch_size, tar_dir):
     pad_height = (patch_size - h % patch_size) % patch_size
     pad_width = (patch_size - w % patch_size) % patch_size
 
-    padded_img = cv2.copyMakeBorder(img, 0, pad_height, 0, pad_width, cv2.BORDER_CONSTANT, value=[0, 0, 0])
+    #padded_img = cv2.copyMakeBorder(img, 0, pad_height, 0, pad_width, cv2.BORDER_CONSTANT, value=[0, 0, 0])
+    if pad_height > 0 or pad_width > 0:
+        normal_padding = np.random.normal(loc=mean, scale=std, size=(h + pad_height, w + pad_width, 3)) / 255.0
+        normal_padding[:h, :w] = img / 255.0
+        padded_img = normal_padding * 255.0
+    else:
+        padded_img = img
 
     padded_h, padded_w = padded_img.shape[:2] 
 
@@ -43,13 +49,13 @@ def process_image(file_path, patch_size, tar_dir):
             cv2.imwrite(os.path.join(tar_dir, patch_name), patch)
             patch_id += 1
 
-def generate_patches(src_dir, tar_dir, patch_size, num_cores):
+def generate_patches(src_dir, tar_dir, patch_size, num_cores, mean=0, std=0):
+    print('std: ', std)
     if not os.path.exists(tar_dir):
         os.makedirs(tar_dir)
 
     files = natsorted(glob(os.path.join(src_dir, '*.png')))
-
-    Parallel(n_jobs=num_cores)(delayed(process_image)(file, patch_size, tar_dir) for file in tqdm(files))
+    Parallel(n_jobs=num_cores)(delayed(process_image)(file, patch_size, tar_dir, mean, std) for file in tqdm(files))
     print("Patching complete.")
 
 def reconstruct_image(patch_files, original_h, original_w, patch_size):
