@@ -15,7 +15,7 @@ def load_checkpoint(model, checkpoint_path):
     model.load_state_dict(checkpoint['model_state_dict'])
     return model
 
-def reverse(src_dir, tar_dir, checkpoint_path, diffusion_model_name, img_size):
+def reverse(src_dir, tar_dir, checkpoint_path, diffusion_model_name, img_size, specific_timesteps):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     estimator = NoiseEstimationCLIP_pretrained()
@@ -41,7 +41,8 @@ def reverse(src_dir, tar_dir, checkpoint_path, diffusion_model_name, img_size):
         file_name = os.path.basename(file).split('.')[0]
         noise_image = Image.open(file).convert('RGB')
         noise_image = transform(noise_image).unsqueeze(0).to(device)
-        timestep = estimator(noise_image)
+        t = torch.arange(specific_timesteps)
+        timestep = estimator(noise_image, t)
         print("Estimated timestep: ", timestep)
 
         denoised_image = reverse_diffusion_from_noise(file, timestep, diffusion_model, scheduler)
