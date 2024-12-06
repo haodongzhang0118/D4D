@@ -8,9 +8,11 @@ def load_pretrained_model(model_name="google/ddpm-ema-cat-256"):
     """Load a pretrained diffusion model"""
     model_id = model_name
     pipeline = DDPMPipeline.from_pretrained(model_id)
-    return pipeline.unet, pipeline.scheduler
+    model, scheduler = pipeline.unet, pipeline.scheduler
+    return model, scheduler
 
-def reverse_diffusion_from_noise(noised_image_path, start_timestep, model_name="google/ddpm-ema-cat-256"):
+
+def reverse_diffusion_from_noise(noised_image_path,start_timestep, model, scheduler):
     """
     Perform reverse diffusion starting from a provided noised image at a specific timestep
 
@@ -18,12 +20,12 @@ def reverse_diffusion_from_noise(noised_image_path, start_timestep, model_name="
         noised_image_path: Path to the noised input image
         start_timestep: The timestep number of the noised image (e.g., 50)
     """
-    model, scheduler = load_pretrained_model(model_name)
-    model.eval()
+    # model, scheduler = load_pretrained_model(model_name)
+    # model.eval()
 
+    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # model.to(device)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model.to(device)
-
     transform = transforms.Compose([
         transforms.Resize((256, 256)), 
         transforms.ToTensor(),
