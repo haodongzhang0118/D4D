@@ -8,6 +8,7 @@ training:
   num_cores: 6
   text_image: True
   clip_pretrained_model_name: "openai/clip-vit-base-patch32" # Choose when text_image is True
+  pretrained_diffusion: "google/ddpm-ema-cat-256"
 
 # Model settings
 model:
@@ -40,3 +41,4 @@ logging:
 checkpoint:
   resume_from: null  # Path to checkpoint if resuming
   resetLR: false
+  best_path: '/content/drive/MyDrive/D4D/logs/2024-12-06_05-35-06/best.pth'
