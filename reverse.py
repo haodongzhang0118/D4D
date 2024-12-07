@@ -1,4 +1,3 @@
-import cv2
 import os
 import torch
 from natsort import natsorted
@@ -39,11 +38,13 @@ def reverse(src_dir, tar_dir, checkpoint_path, diffusion_model_name, img_size, s
     files = natsorted(glob(os.path.join(src_dir, '*.png')))
     for file in tqdm(files):
         file_name = os.path.basename(file).split('.')[0]
+        file_name += ".png"
         noise_image = Image.open(file).convert('RGB')
         noise_image = transform(noise_image).unsqueeze(0).to(device)
         t = torch.arange(specific_timesteps)
-        timestep = estimator(noise_image, t)
+        logits = estimator(noise_image, t)
+        timestep = (torch.argmax((100 * logits).softmax(dim=-1))).item()
         print("Estimated timestep: ", timestep)
 
         denoised_image = reverse_diffusion_from_noise(file, timestep, diffusion_model, scheduler)
-        cv2.imwrite(os.path.join(tar_dir, file_name), denoised_image)
+        denoised_image.save(os.path.join(tar_dir, file_name))

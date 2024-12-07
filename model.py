@@ -57,7 +57,8 @@ class NoiseEstimationCLIP_pretrained(nn.Module):
             text=texts,
             images=images,
             return_tensors="pt",
-            padding=True
+            padding=True,
+            do_rescale=False
         )
         
         inputs = {k: v.to(self.device) if isinstance(v, torch.Tensor) else v 
