@@ -25,10 +25,10 @@ model:
 
 # Data settings
 data:
-  image_dir: '/content/drive/MyDrive/Dataset/DIV2K/3patches'  # Path to training directory
-  valid_dir: '/content/drive/MyDrive/Dataset/validation_patches'  # Path to validation directory
-  clean_image: '/content/drive/MyDrive/cleanImage.pt' # Path to clean image directory
-  valid_image: '/content/drive/MyDrive/validImage.pt' # Path to valid image directory
+  image_dir: '/path/to/your/data'  # Path to training directory
+  valid_dir: '/path/to/your/validation data'  # Path to validation directory
+  clean_image: '/path/to/your/data.pt' # Path to clean image directory
+  valid_image: '/path/to/your/validation data.pt' # Path to valid image directory
   num_workers: 0
 
 # Logging settings
@@ -41,4 +41,4 @@ logging:
 checkpoint:
   resume_from: null  # Path to checkpoint if resuming
   resetLR: false
-  best_path: '/content/drive/MyDrive/D4D/logs/2024-12-06_05-35-06/best.pth'
+  best_path: '/path/to/your/best_model.pth'  # Path to save best model
